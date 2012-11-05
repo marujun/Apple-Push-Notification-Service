@@ -1,0 +1,88 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+    <title>ios push demo</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" >
+    <script src="<%=cilentIP%>:8888/socket.io/socket.io.js"></script>
+    <script language="JavaScript">
+        var socket;
+        socket = io.connect('<%=cilentIP%>:8888',{'reconnect':true,'reconnection delay':50,'auto connect':true});
+        socket.on('refresh',function(data){
+            console.log("the client received message is:",data.state);
+            location.href ="<%=cilentIP%>:3000/";
+        });
+        socket.on('alert',function(data){
+            alert(data);
+        });
+        socket.on('connect',function(){
+            console.log("the client has connect with server !");
+        });
+        function push(){
+            var token=document.getElementById('token');
+            var selectTokens = [];
+            for(var i=0;i<token.length;i++){
+                if(token.options[i].selected){
+                    selectTokens.push(token.options[i].value);
+                }
+            }
+            var colour=document.getElementById('colour').value;
+            var message=document.getElementById('message').value;
+            var sound=document.getElementById('sound').value;
+            var badge=document.getElementById('badge').value;
+            var ActionLocKey=document.getElementById('ActionLocKey').value;
+            socket.emit("message",{colour:colour,tokens:selectTokens,message:message,sound:sound,ActionLocKey:ActionLocKey,badge:badge});
+        }
+    </script>
+</head>
+<body>
+<table style="margin-left: 300px">
+    <tr class="tr">
+        <td class="td">devive  :</td>
+        <td class="td">
+            <select id="token" class="select" multiple="multiple" >
+             <% token.forEach(function(data){ %>
+                <option value ="<%=data.token%>"><%=data.name%></option>
+             <%})%>
+            </select>
+        </td>
+    </tr>
+    <tr class="tr">
+        <td class="td">badge  :</td>
+        <td class="td">
+            <input id="badge" value=5>
+        </td >
+    </tr>
+    <tr class="tr">
+        <td class="td">colour  :</td>
+        <td class="td">
+            <select id="colour" class="select">
+                <option value ="green">green</option>
+                <option value ="yellow">yellow</option>
+            </select>
+        </td >
+    </tr>
+    <tr class="tr">
+        <td class="td">sound  :</td>
+        <td class="td">
+            <select id="sound" class="select">
+                <option value ="startSound.wav">startSound.wav</option>
+                <option value ="endSound.wav">endSound.wav</option>
+            </select>
+        </td >
+    </tr>
+    <tr class="tr">
+        <td class="td">ActionLocKey  :</td>
+        <td class="td">
+            <input id="ActionLocKey" value='查看提醒'>
+        </td >
+    </tr>
+    <tr class="tr">
+        <td class="td">message  :</td>
+        <td class="td">
+            <input id="message" value='您有新的短消息！'>
+        </td >
+    </tr>
+</table>
+<button onclick="push()"><font size="5">push</font></button>
+</body>
+</html>
